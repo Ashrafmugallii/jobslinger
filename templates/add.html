@@ -1,31 +1,247 @@
 {% extends 'base.html' %}
 {% block content %}
-<h4>Add New Job</h4>
-<form method="POST">
-    <div class="mb-3">
-        <input type="text" name="company" class="form-control" placeholder="Company" required>
+
+<div class="form-wrapper">
+  <!-- Terminal-style animated header -->
+  <div class="terminal-title">
+    <span id="typewriter-text"></span>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-container mb-4">
+    <div class="progress-bar" id="formProgress"></div>
+    <div class="step-labels">
+      <span>Job Info</span><span>App Details</span><span>Notes</span>
     </div>
-    <div class="mb-3">
-        <input type="text" name="role" class="form-control" placeholder="Role" required>
+  </div>
+
+  <form method="POST" id="jobForm">
+
+    <!-- SECTION 1 -->
+    <div class="form-section active" id="section-1">
+      <label>Company</label>
+      <input type="text" name="company" required oninput="updatePreview()">
+      <label>Role</label>
+      <input type="text" name="role" required oninput="updatePreview()">
+      <label>Location</label>
+      <input type="text" name="location" oninput="updatePreview()">
+      <label>Remote</label>
+      <select name="remote">
+        <option value="">Select</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+      <button type="button" onclick="goToSection(2)">Next</button>
     </div>
-    <div class="mb-3">
-        <input type="url" name="link" class="form-control" placeholder="Job Link">
+
+    <!-- SECTION 2 -->
+    <div class="form-section" id="section-2">
+      <label>Date Applied</label>
+      <input type="date" name="date_applied" value="{{ today }}">
+      <label>Follow-Up Due</label>
+      <input type="date" name="follow_up_due" value="{{ follow_up_default }}">
+      <label>Salary Range</label>
+      <select name="salary">
+        <option value="">Select Salary</option>
+        {% for i in range(40000, 505000, 5000) %}
+          <option value="${{ i }}">${{ "{:,}".format(i) }}</option>
+        {% endfor %}
+      </select>
+      <label>Source</label>
+      <input type="text" name="source">
+      <label>Job Type</label>
+      <select name="job_type">
+        <option>Full-Time</option>
+        <option>Part-Time</option>
+        <option>Internship</option>
+        <option>Contract</option>
+      </select>
+      <label>Priority</label>
+      <select name="priority" oninput="updatePreview()">
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+      <label>Job Link</label>
+      <input type="url" name="link">
+      <label>Resume Version</label>
+      <input type="text" name="resume">
+      <label>Status</label>
+      <select name="status">
+        <option>Not Applied</option>
+        <option>Applied</option>
+        <option>Interviewing</option>
+        <option>Offer</option>
+        <option>Rejected</option>
+      </select>
+      <div class="nav-buttons">
+        <button type="button" onclick="goToSection(1)">Back</button>
+        <button type="button" onclick="goToSection(3)">Next</button>
+      </div>
     </div>
-    <div class="mb-3">
-        <input type="text" name="resume" class="form-control" placeholder="Resume Version">
+
+    <!-- SECTION 3 -->
+    <div class="form-section" id="section-3">
+      <label>Recruiter Contact</label>
+      <input type="text" name="contact">
+      <label>Notes</label>
+      <textarea name="notes" rows="4"></textarea>
+      <div class="nav-buttons">
+        <button type="button" onclick="goToSection(2)">Back</button>
+        <button type="submit" class="submit-btn">Save Job</button>
+      </div>
+
+      <!-- Preview Panel -->
+      <div class="preview-panel mt-5">
+        <div class="card-glass">
+          <h4 class="preview-company">[Company]</h4>
+          <h6 class="preview-role">[Role]</h6>
+          <p>Location: <span class="preview-location">[Location]</span></p>
+          <p>Applied: {{ today }}</p>
+          <p>Priority: <span class="preview-priority">[Priority]</span></p>
+        </div>
+      </div>
     </div>
-    <div class="mb-3">
-        <select name="status" class="form-select">
-            <option>Not Applied</option>
-            <option>Applied</option>
-            <option>Interviewing</option>
-            <option>Offer</option>
-            <option>Rejected</option>
-        </select>
-    </div>
-    <div class="mb-3">
-        <textarea name="notes" class="form-control" placeholder="Notes" rows="3"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Save Job</button>
-</form>
+  </form>
+</div>
+
+<style>
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: 'Share Tech Mono', monospace;
+}
+.form-wrapper {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 2rem;
+  max-width: 750px;
+  margin: 2rem auto;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  color: #fff;
+}
+.form-section {
+  display: none;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 0.5s ease-in-out;
+}
+.form-section.active {
+  display: block;
+  opacity: 1;
+  transform: scale(1);
+}
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-size: 0.95rem;
+}
+button {
+  background: #00c9ff;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: 0.2s ease;
+}
+button:hover {
+  background: #92fe9d;
+  transform: scale(1.05);
+}
+.submit-btn {
+  background: #f7971e;
+}
+.submit-btn:hover {
+  background: #ffd200;
+}
+.progress-container {
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 0.5rem;
+}
+.progress-bar {
+  height: 6px;
+  background: #00c9ff;
+  width: 33.3%;
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+.step-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #ddd;
+  margin-top: 5px;
+}
+.terminal-title {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: #00ffe0;
+  border-left: 4px solid #00ffe0;
+  padding-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+.card-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  color: #fff;
+}
+</style>
+{% raw %}
+<script>
+const sectionLabels = {
+  1: "// JOB INFO",
+  2: "// APPLICATION DETAILS",
+  3: "// NOTES & CONTACT"
+};
+
+function typeText(text, elementId) {
+  const el = document.getElementById(elementId);
+  el.innerText = '';
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      el.innerText += text[i++];
+      setTimeout(type, 35);
+    }
+  }
+  type();
+}
+
+function goToSection(n) {
+  const sections = document.querySelectorAll('.form-section');
+  sections.forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + n).classList.add('active');
+  document.getElementById('formProgress').style.width = (n * 33.3) + '%';
+  if (n === 3) updatePreview();
+  typeText(sectionLabels[n], "typewriter-text");
+}
+
+function updatePreview() {
+  document.querySelector('.preview-company').innerText =
+    document.querySelector('input[name="company"]').value || '[Company]';
+  document.querySelector('.preview-role').innerText =
+    document.querySelector('input[name="role"]').value || '[Role]';
+  document.querySelector('.preview-location').innerText =
+    document.querySelector('input[name="location"]').value || '[Location]';
+  document.querySelector('.preview-priority').innerText =
+    document.querySelector('select[name="priority"]').value || '[Priority]';
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  typeText(sectionLabels[1], "typewriter-text");
+});
+</script>
+{% endraw %}
+
 {% endblock %}

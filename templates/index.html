@@ -1,32 +1,203 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Your Job Applications</h4>
-    <a href="{{ url_for('add') }}" class="btn btn-success">+ Add Job</a>
-</div>
 
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Company</th>
-            <th>Role</th>
-            <th>Link</th>
-            <th>Resume</th>
-            <th>Status</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for job in jobs %}
-        <tr>
-            <td>{{ job[2] }}</td>
-            <td>{{ job[3] }}</td>
-            <td><a href="{{ job[4] }}" target="_blank">View</a></td>
-            <td>{{ job[5] }}</td>
-            <td>{{ job[6] }}</td>
-            <td>{{ job[7] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!-- NAVBAR -->
+<nav class="navbar-glass">
+  <div class="nav-left">
+    <h3>JobSlinger</h3>
+  </div>
+  <div class="nav-right">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('add') }}">+ Add Job</a>
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</nav>
+
+<div class="header-title">Your Applications</div>
+
+{% if jobs %}
+<div class="job-grid">
+  {% for job in jobs %}
+  <div class="job-card animate-in">
+    <div class="job-card-header">
+      <h4>{{ job[2] }}</h4>
+      <span class="job-role">{{ job[3] }}</span>
+    </div>
+    <div class="job-details">
+      <p><i class="bi bi-geo-alt"></i> {{ job[4] }} • {{ job[5] }}</p>
+      <p><i class="bi bi-calendar-check"></i> Applied: {{ job[6] }}</p>
+      <p><i class="bi bi-alarm"></i> Follow-up: {{ job[12] }}</p>
+      <p><i class="bi bi-award"></i> Type: {{ job[9] }} • {{ job[8] }}</p>
+      <p><i class="bi bi-lightning-fill"></i> Priority: 
+        <span class="badge priority {{ job[10]|lower }}">{{ job[10] }}</span></p>
+      <p><i class="bi bi-circle-fill"></i> Status: 
+        <span class="badge status {{ job[15]|lower|replace(' ', '-') }}">{{ job[15] }}</span></p>
+      <p><i class="bi bi-link-45deg"></i> 
+        {% if job[13] %}<a href="{{ job[13] }}" target="_blank">Job Link</a>{% else %}—{% endif %}
+      </p>
+    </div>
+    <div class="job-actions">
+      <a href="{{ url_for('edit', job_id=job[0]) }}" class="btn btn-edit">
+        <i class="bi bi-pencil-square"></i> Edit
+      </a>
+      <a href="{{ url_for('delete', job_id=job[0]) }}" class="btn btn-delete" 
+         onclick="return confirm('Are you sure you want to delete this job?');">
+        <i class="bi bi-trash3"></i> Delete
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="bi bi-inbox display-3"></i>
+  <p>No jobs yet. Add your first and begin tracking!</p>
+</div>
+{% endif %}
+
+<style>
+body {
+  background: linear-gradient(145deg, #111, #1e1e2f);
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.navbar-glass {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar-glass h3 {
+  color: #00ffe0;
+}
+.navbar-glass a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+.navbar-glass a:hover {
+  color: #00ffe0;
+}
+
+.header-title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin: 2rem 0 1rem;
+  font-weight: bold;
+  color: #00ffe0;
+}
+
+.job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem 3rem;
+}
+
+.job-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 0 10px rgba(0,255,255,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 0.5s ease forwards;
+}
+.job-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 20px rgba(0,255,255,0.2);
+}
+.job-card-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #00ffe0;
+}
+.job-role {
+  font-size: 0.85rem;
+  color: #ccc;
+}
+.job-details {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+.job-details i {
+  color: #999;
+  margin-right: 6px;
+}
+.badge {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.priority.high { background: #e74c3c; color: #fff; }
+.priority.medium { background: #f1c40f; color: #111; }
+.priority.low { background: #2ecc71; color: #111; }
+.status.applied { background: #3498db; }
+.status.interviewing { background: #9b59b6; }
+.status.offer { background: #2ecc71; }
+.status.rejected { background: #e74c3c; }
+.status["not-applied"] { background: #95a5a6; }
+
+.job-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+.btn {
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.btn-edit {
+  background: #2980b9;
+  color: #fff;
+}
+.btn-delete {
+  background: #c0392b;
+  color: #fff;
+}
+.btn-edit:hover, .btn-delete:hover {
+  opacity: 0.85;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 4rem;
+  color: #aaa;
+}
+.animate-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease forwards;
+}
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.animate-in').forEach((card, i) => {
+    card.style.animationDelay = `${i * 100}ms`;
+  });
+});
+</script>
+
 {% endblock %}

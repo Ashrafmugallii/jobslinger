@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="dashboard-container">
+  <div class="terminal-title mb-4">// JOBSLINGER DASHBOARD</div>
+
+  <!-- TOP KPIs -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="kpi-box"><h6>Total Applications</h6><h3>{{ total_jobs }}</h3></div>
+    </div>
+    {% for label, count in status_data.items() %}
+    <div class="col-md-3">
+      <div class="kpi-box"><h6>{{ label }}</h6><h4>{{ count }}</h4></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- CHART SECTION -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="card-glass p-4">
+        <h5>📈 Applications Over Time</h5>
+        <canvas id="trendChart" height="240"></canvas>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-glass p-4">
+        <h5>📊 Priority Breakdown</h5>
+        <canvas id="priorityBar" height="240"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLLOW-UP TABLE -->
+  <div class="card-glass p-4 mt-4">
+    <h5>⏰ Follow-Up Queue</h5>
+    <table class="table table-dark table-borderless align-middle">
+      <thead>
+        <tr><th>Company</th><th>Role</th><th>Due Date</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for job in followups %}
+        <tr>
+          <td>{{ job.company }}</td>
+          <td>{{ job.role }}</td>
+          <td>{{ job.follow_up_due }}</td>
+          <td>
+            {% if job.urgency == "Overdue" %}
+              <span class="badge bg-danger">Overdue</span>
+            {% elif job.urgency == "Upcoming" %}
+              <span class="badge bg-warning text-dark">Upcoming</span>
+            {% else %}
+              <span class="badge bg-secondary">Future</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const trendCtx = document.getElementById('trendChart');
+new Chart(trendCtx, {
+  type: 'line',
+  data: {
+    labels: {{ trend_dates | tojson }},
+    datasets: [{
+      label: 'Applications',
+      data: {{ trend_counts | tojson }},
+      borderColor: '#00c9ff',
+      tension: 0.4,
+      fill: false,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#ccc' }, grid: { display: false } },
+      y: { ticks: { color: '#ccc' }, beginAtZero: true }
+    }
+  }
+});
+
+const priorityCtx = document.getElementById('priorityBar');
+new Chart(priorityCtx, {
+  type: 'bar',
+  data: {
+    labels: {{ priority_data.keys() | list | tojson }},
+    datasets: [{
+      label: 'Applications',
+      data: {{ priority_data.values() | list | tojson }},
+      backgroundColor: ['#dc3545', '#ffc107', '#198754']
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#ccc' }, grid: { display: false } },
+      y: { ticks: { color: '#ccc' }, beginAtZero: true }
+    }
+  }
+});
+</script>
+
+<!-- STYLES -->
+<style>
+body {
+  background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+  font-family: 'Share Tech Mono', monospace;
+}
+.dashboard-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  color: #fff;
+}
+.terminal-title {
+  font-size: 1.4rem;
+  color: #00ffe0;
+  border-left: 4px solid #00ffe0;
+  padding-left: 12px;
+}
+.kpi-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.kpi-box h6 {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-transform: uppercase;
+}
+.kpi-box h3, .kpi-box h4 {
+  margin-top: 0.5rem;
+  font-weight: 700;
+}
+.card-glass {
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  color: #fff;
+}
+</style>
+
+{% endblock %}

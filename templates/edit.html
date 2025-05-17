@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-wrapper">
+  <!-- Terminal-style animated header -->
+  <div class="terminal-title">
+    <span id="typewriter-text">JOBSLINGER // EDIT APPLICATION</span>
+  </div>
+
+  <form method="POST" id="jobEditForm">
+    <div class="row">
+      <!-- LEFT Column -->
+      <div class="col-lg-7">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Company</label>
+            <input type="text" name="company" class="form-control" value="{{ job[2] }}" required oninput="updatePreview()">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Role</label>
+            <input type="text" name="role" class="form-control" value="{{ job[3] }}" required oninput="updatePreview()">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Location</label>
+            <input type="text" name="location" class="form-control" value="{{ job[4] }}" oninput="updatePreview()">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Remote</label>
+            <input type="text" name="remote" class="form-control" value="{{ job[5] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Date Applied</label>
+            <input type="date" name="date_applied" class="form-control" value="{{ job[6] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Follow-up Due</label>
+            <input type="date" name="follow_up_due" class="form-control" value="{{ job[12] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Salary</label>
+            <input type="text" name="salary" class="form-control" value="{{ job[7] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Source</label>
+            <input type="text" name="source" class="form-control" value="{{ job[8] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Job Type</label>
+            <input type="text" name="job_type" class="form-control" value="{{ job[9] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Priority</label>
+            <input type="text" name="priority" class="form-control" value="{{ job[10] }}" oninput="updatePreview()">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Recruiter Contact</label>
+            <input type="text" name="contact" class="form-control" value="{{ job[11] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Job Link</label>
+            <input type="url" name="link" class="form-control" value="{{ job[13] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Resume Version</label>
+            <input type="text" name="resume" class="form-control" value="{{ job[14] }}">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>Status</label>
+            <select name="status" class="form-select">
+              {% for s in ['Not Applied', 'Applied', 'Interviewing', 'Offer', 'Rejected'] %}
+                <option value="{{ s }}" {% if s == job[15] %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 mb-3">
+            <label>Notes</label>
+            <textarea name="notes" class="form-control" rows="4">{{ job[16] }}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- RIGHT Column (Live Preview) -->
+      <div class="col-lg-5">
+        <div class="preview-panel mt-4 mt-lg-0">
+          <div class="card-glass">
+            <h4 class="preview-company">{{ job[2] }}</h4>
+            <h6 class="preview-role text-muted">{{ job[3] }}</h6>
+            <p>Location: <span class="preview-location">{{ job[4] }}</span></p>
+            <p>Applied: {{ job[6] }}</p>
+            <p>Priority: <span class="preview-priority">{{ job[10] }}</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+body {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: 'Share Tech Mono', monospace;
+}
+.form-wrapper {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 2rem auto;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  color: #fff;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-size: 0.95rem;
+}
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+button {
+  background: #00c9ff;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: 0.2s ease;
+}
+button:hover {
+  background: #92fe9d;
+  transform: scale(1.05);
+}
+.preview-panel {
+  position: sticky;
+  top: 2rem;
+}
+.card-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  color: #fff;
+}
+.terminal-title {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #00ffe0;
+  border-left: 4px solid #00ffe0;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+</style>
+
+<script>
+function updatePreview() {
+  document.querySelector('.preview-company').innerText =
+    document.querySelector('input[name="company"]').value || '[Company]';
+  document.querySelector('.preview-role').innerText =
+    document.querySelector('input[name="role"]').value || '[Role]';
+  document.querySelector('.preview-location').innerText =
+    document.querySelector('input[name="location"]').value || '[Location]';
+  document.querySelector('.preview-priority').innerText =
+    document.querySelector('input[name="priority"]').value || '[Priority]';
+}
+</script>
+
+{% endblock %}
+    

@@ -1,38 +1,36 @@
 body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    padding: 20px;
-}
-.container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px #aaa;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 8px;
-    border: 1px solid #ccc;
-}
-a {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+  }
+  
+  .card {
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .card:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  }
+  
+  .btn {
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  
+  .table th {
+    font-weight: 600;
+    color: #555;
+  }
+  
+  a {
     text-decoration: none;
-    color: #007BFF;
-}
-input, textarea, select {
-    width: 100%;
-    margin-bottom: 10px;
-}
-button {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-button:hover {
-    background-color: #0056b3;
-}
+  }
+  
+  textarea, input, select {
+    border-radius: 10px !important;
+    font-size: 0.95rem;
+  }
+  
