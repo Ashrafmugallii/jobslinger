@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Your Job Applications</h4>
+    <a href="{{ url_for('add') }}" class="btn btn-success">+ Add Job</a>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Link</th>
+            <th>Resume</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job[2] }}</td>
+            <td>{{ job[3] }}</td>
+            <td><a href="{{ job[4] }}" target="_blank">View</a></td>
+            <td>{{ job[5] }}</td>
+            <td>{{ job[6] }}</td>
+            <td>{{ job[7] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
