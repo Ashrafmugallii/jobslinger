@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: jobslinger
+    env: python
+    buildCommand: ""
+    startCommand: ./start.sh
+    envVars:
+      - key: FLASK_ENV
+        value: production
+    plan: free
